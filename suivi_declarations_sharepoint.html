@@ -1592,16 +1592,17 @@ async function handleImportXlsx(e) {
       });
 
       // Upload vers SharePoint
-      setSyncStatus('syncing','Import vers SharePoint…');
-      document.getElementById('loading-msg').textContent=`Import ${importedClients.length} clients…`;
+      setSyncStatus('syncing','Import vers SharePoint...');
+      const setMsg = msg => { const el=document.getElementById('loading-msg'); if(el) el.textContent=msg; };
+      showLoading(`Import ${importedClients.length} clients...`);
       for(let i=0;i<importedClients.length;i++) {
         const rec=importedClients[i];
-        document.getElementById('loading-msg').textContent=`Import clients ${i+1}/${importedClients.length}…`;
+        setMsg(`Import clients ${i+1}/${importedClients.length}...`);
         try { await spSaveClient(rec); } catch(e) { console.warn('Client skip',rec.Client,e.message); }
       }
-      document.getElementById('loading-msg').textContent=`Import ${importedOb.length} obligations…`;
+      setMsg(`Import ${importedOb.length} obligations...`);
       for(let i=0;i<importedOb.length;i+=5) {
-        document.getElementById('loading-msg').textContent=`Import obligations ${i}/${importedOb.length}…`;
+        setMsg(`Import obligations ${i+1}/${importedOb.length}...`);
         await Promise.all(importedOb.slice(i,i+5).map(o=>spSaveObligation(o).catch(e=>console.warn('Ob skip',e.message))));
       }
       hideLoading(); setSyncStatus('ok','✓ Import terminé');
